@@ -1,14 +1,68 @@
 import { ethers } from 'ethers'
 import { L3Config } from './l3ConfigType'
 import fs from 'fs'
+import path from 'path'
+import { spawn } from 'child_process'
 import { ethOrERC20Deposit } from './nativeTokenDeposit'
-import { createERC20Bridge } from './createTokenBridge'
 import { l3Configuration } from './l3Configuration'
 import { defaultRunTimeState, RuntimeState } from './runTimeState'
 import { transferOwner } from './transferOwnership'
+
 // Delay function
 function delay(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+function runTokenBridgeDeploymentWithChainSdk(params: {
+  privateKey: string
+  l2RpcUrl: string
+  l3RpcUrl: string
+  rollupAddress: string
+  nativeToken: string
+  chainId: number
+}) {
+  const scriptPath = path.resolve(
+    process.cwd(),
+    '..',
+    'deploy_chain',
+    'create-token-bridge-custom-fee-token',
+    'index.js'
+  )
+
+  const env = {
+    ...process.env,
+    ROLLUP_ADDRESS: params.rollupAddress,
+    ROLLUP_OWNER_PRIVATE_KEY: params.privateKey,
+    ORBIT_CHAIN_ID: String(params.chainId),
+    ORBIT_CHAIN_RPC: params.l3RpcUrl,
+    CUSTOM_FEE_TOKEN_ADDRESS: params.nativeToken,
+    PARENT_CHAIN_RPC: params.l2RpcUrl,
+  }
+
+  return new Promise<void>((resolve, reject) => {
+    const child = spawn('node', [scriptPath], {
+      cwd: path.dirname(scriptPath),
+      env,
+      stdio: 'inherit',
+      shell: process.platform === 'win32',
+    })
+
+    child.on('error', error => {
+      reject(error)
+    })
+
+    child.on('exit', code => {
+      if (code === 0) {
+        resolve()
+        return
+      }
+      reject(
+        new Error(
+          `Token bridge deployment script exited with non-zero code ${code}`
+        )
+      )
+    })
+  })
 }
 
 function checkRuntimeStateIntegrity(rs: RuntimeState) {
@@ -157,7 +211,20 @@ async function main() {
       console.log(
         'Running tokenBridgeDeployment or erc20TokenBridge script to deploy token bridge contracts on parent chain and your Orbit chain 🌉🌉🌉🌉🌉'
       )
-      await createERC20Bridge(L2_RPC_URL, privateKey, L3_RPC_URL, config.rollup)
+      if (!config.nativeToken) {
+        throw new Error(
+          'config.nativeToken is required to deploy token bridge with custom-fee-token chain-sdk script'
+        )
+      }
+
+      await runTokenBridgeDeploymentWithChainSdk({
+        privateKey,
+        l2RpcUrl: L2_RPC_URL,
+        l3RpcUrl: L3_RPC_URL,
+        rollupAddress: config.rollup,
+        nativeToken: config.nativeToken,
+        chainId: config.chainId,
+      })
       rs.tokenBridgeDeployed = true
     }
     ////////////////////////////////
