@@ -1,6 +1,11 @@
 import { createPublicClient, http } from 'viem';
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
 import { arbitrumSepolia } from 'viem/chains';
+import { config } from 'dotenv';
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
+const __dirname = dirname(fileURLToPath(import.meta.url));
+config({ path: resolve(__dirname, '.env') });
 import {
   prepareChainConfig,
   createRollupPrepareDeploymentParamsConfig,
@@ -8,9 +13,7 @@ import {
   prepareNodeConfig,
 } from '@arbitrum/chain-sdk';
 import { sanitizePrivateKey, generateChainId } from '@arbitrum/chain-sdk/utils';
-import { config } from 'dotenv';
 import * as fs from 'fs';
-config();
 
 function withFallbackPrivateKey(privateKey) {
   if (typeof privateKey === 'undefined' || privateKey === '') {

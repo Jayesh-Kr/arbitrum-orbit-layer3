@@ -2,7 +2,10 @@ import { createPublicClient, createWalletClient, http, parseEther, defineChain }
 import { privateKeyToAccount } from 'viem/accounts';
 import { arbitrumSepolia } from 'viem/chains';
 import {config} from 'dotenv';
-config();
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
+const __dirname = dirname(fileURLToPath(import.meta.url));
+config({ path: resolve(__dirname, '.env') });
 
 const PRIVATE_KEY = process.env.SENDER_PRIVATE_KEY
 const TOKEN_ADDRESS = process.env.CUSTOM_TOKEN_ADDRESS || '0xf4d293439bCCb7777FE70Df030844a4f5E12e80E';

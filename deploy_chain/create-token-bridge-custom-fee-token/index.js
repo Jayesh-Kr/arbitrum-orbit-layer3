@@ -9,7 +9,10 @@ import {
 } from '@arbitrum/chain-sdk';
 import { sanitizePrivateKey } from '@arbitrum/chain-sdk/utils';
 import { config } from 'dotenv';
-config();
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
+const __dirname = dirname(fileURLToPath(import.meta.url));
+config({ path: resolve(__dirname, '.env') });
 
 function getBlockExplorerUrl(chain) {
   return chain.blockExplorers?.default.url;
