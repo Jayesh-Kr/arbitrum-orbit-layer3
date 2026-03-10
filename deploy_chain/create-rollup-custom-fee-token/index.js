@@ -124,8 +124,8 @@ async function main() {
       ...result.coreContracts,
       nativeToken,
     };
-    fs.writeFileSync('./orbitSetupConfig.json', JSON.stringify(orbitSetupConfig, null, 2));
-    console.log('✅ orbitSetupConfig.json saved!');
+    fs.writeFileSync('./orbitSetupScriptConfig.json', JSON.stringify(orbitSetupConfig, null, 2));
+    console.log('✅ orbitSetupScriptConfig.json saved!');
 
     console.log('\n=== NEXT STEP ===');
     console.log('Copy nodeConfig.json and orbitSetupConfig.json to your orbit-setup-script/config/ folder');

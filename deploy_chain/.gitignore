@@ -1,3 +1,4 @@
 node_modules
 .env
 erc20-deployment.json
+*.json
