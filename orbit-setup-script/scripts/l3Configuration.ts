@@ -30,9 +30,11 @@ export async function l3Configuration(
 
   // Reading params for L3 Configuration
   const minL2BaseFee = config.minL2BaseFee
-  const networkFeeReceiver = config.networkFeeReceiver
-  const infrastructureFeeCollector = config.infrastructureFeeCollector
   const chainOwner = config.chainOwner
+  // Fall back to chainOwner if not explicitly set in config
+  const networkFeeReceiver = config.networkFeeReceiver || chainOwner
+  const infrastructureFeeCollector =
+    config.infrastructureFeeCollector || chainOwner
 
   // Check if the Private Key provided is the chain owner:
   if (l3signer.address !== chainOwner) {

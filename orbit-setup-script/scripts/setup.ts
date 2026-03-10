@@ -86,6 +86,10 @@ function checkRuntimeStateIntegrity(rs: RuntimeState) {
   }
 }
 
+function persistRuntimeState(rs: RuntimeState) {
+  fs.writeFileSync('./config/resumeState.json', JSON.stringify(rs, null, 2))
+}
+
 async function main() {
   // Read the environment variables
   const privateKey = process.env.PRIVATE_KEY
@@ -123,6 +127,7 @@ async function main() {
   }
 
   rs.chainId = config.chainId
+  persistRuntimeState(rs)
   // Generating providers from RPCs
   const L2Provider = new ethers.providers.JsonRpcProvider(L2_RPC_URL)
   const L3Provider = new ethers.providers.JsonRpcProvider(L3_RPC_URL)
@@ -153,6 +158,7 @@ async function main() {
         `Transaction was mined in block ${receipt1.blockNumber} on parent chain`
       )
       rs.etherSent.batchPoster = true
+      persistRuntimeState(rs)
     }
 
     if (!rs.etherSent.staker) {
@@ -167,6 +173,7 @@ async function main() {
         `Transaction was mined in block ${receipt2.blockNumber} on parent chain`
       )
       rs.etherSent.staker = true
+      persistRuntimeState(rs)
     }
 
     if (!rs.nativeTokenDeposit) {
@@ -202,6 +209,7 @@ async function main() {
         await delay(30 * 1000)
       }
       rs.nativeTokenDeposit = true
+      persistRuntimeState(rs)
     }
 
     if (!rs.tokenBridgeDeployed) {
@@ -226,6 +234,7 @@ async function main() {
         chainId: config.chainId,
       })
       rs.tokenBridgeDeployed = true
+      persistRuntimeState(rs)
     }
     ////////////////////////////////
     /// L3 Chain Configuration ///
@@ -236,6 +245,7 @@ async function main() {
       )
       await l3Configuration(privateKey, L2_RPC_URL, L3_RPC_URL)
       rs.l3config = true
+      persistRuntimeState(rs)
     }
     ////////////////////////////////
     /// Transfering ownership /////
@@ -246,11 +256,14 @@ async function main() {
       )
       await transferOwner(privateKey, L2Provider, L3Provider)
       rs.transferOwnership = true
+      persistRuntimeState(rs)
     }
+
+    // Persist a fully completed state for future reruns.
+    persistRuntimeState(rs)
   } catch (error) {
     console.error('Error occurred:', error)
-    const runtimeString = JSON.stringify(rs)
-    fs.writeFileSync('./config/resumeState.json', runtimeString)
+    persistRuntimeState(rs)
     console.log(
       "Seems something went wrong during this process, but don't worry, we have recorded the deployed and initialized contracts into ./config/resumeState.json, next time you rerun the script, it will restart from where it failed "
     )
