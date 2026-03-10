@@ -119,8 +119,11 @@ async function main() {
       parentChainId: parentChain.id,
       chainOwner: deployer.address,
       batchPoster,
+      staker: validator,
       minL2BaseFee,
       chainName,
+      networkFeeReceiver: deployer.address,
+      infrastructureFeeCollector: deployer.address,
       ...result.coreContracts,
       nativeToken,
     };

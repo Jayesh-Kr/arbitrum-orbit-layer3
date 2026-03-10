@@ -1,4 +1,4 @@
-import { Chain, createPublicClient, http, defineChain } from 'viem';
+import { createPublicClient, http, defineChain } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { arbitrumSepolia } from 'viem/chains';
 import {
