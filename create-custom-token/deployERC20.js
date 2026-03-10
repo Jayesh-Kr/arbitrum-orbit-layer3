@@ -142,6 +142,22 @@ async function main() {
 		publicClient.readContract({ address: contractAddress, abi: tokenContract, functionName: 'owner' }),
 	]);
 
+	const deploymentSummary = {
+		status: 'Deployment successful.',
+		transactionHash: receipt.transactionHash,
+		contractAddress,
+		owner,
+		name: deployedName,
+		symbol: deployedSymbol,
+		decimals,
+		initialSupplyBaseUnits: totalSupply.toString(),
+		initialSupplyTokens: DEFAULT_INITIAL_SUPPLY,
+		explorer: `${arbitrumSepolia.blockExplorers.default.url}/address/${contractAddress}`,
+	};
+
+	const outputFile = path.resolve(__dirname, 'erc20-deployment.json');
+	fs.writeFileSync(outputFile, JSON.stringify(deploymentSummary, null, 2));
+
 	console.log('Deployment successful.');
 	console.log(`Transaction hash: ${receipt.transactionHash}`);
 	console.log(`Contract address: ${contractAddress}`);
@@ -151,6 +167,7 @@ async function main() {
 	console.log(`Decimals: ${decimals}`);
 	console.log(`Initial supply: ${totalSupply.toString()} base units (${DEFAULT_INITIAL_SUPPLY} tokens)`);
 	console.log(`Explorer: ${arbitrumSepolia.blockExplorers.default.url}/address/${contractAddress}`);
+	console.log(`Deployment JSON saved: ${outputFile}`);
 }
 
 main().catch((error) => {
