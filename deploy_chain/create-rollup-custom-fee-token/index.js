@@ -31,6 +31,9 @@ if (typeof process.env.CUSTOM_FEE_TOKEN_ADDRESS === 'undefined') {
 if (typeof process.env.PARENT_CHAIN_RPC === 'undefined' || process.env.PARENT_CHAIN_RPC === '') {
   console.warn(`Warning: you may encounter timeout errors. Please provide PARENT_CHAIN_RPC.`);
 }
+if (!process.env.CHAIN_NAME) {
+  throw new Error("Chain name not found. Provide the chain name in .env")
+}
 
 // load or generate a random batch poster account
 const batchPosterPrivateKey = withFallbackPrivateKey(process.env.BATCH_POSTER_PRIVATE_KEY);
@@ -51,7 +54,7 @@ const parentChainPublicClient = createPublicClient({
 const deployer = privateKeyToAccount(sanitizePrivateKey(process.env.DEPLOYER_PRIVATE_KEY));
 
 async function main() {
-  const chainName = process.env.CHAIN_NAME ?? 'HushConfession';
+  const chainName = process.env.CHAIN_NAME;
   const minL2BaseFee = Number(process.env.MIN_L2_BASE_FEE ?? 100000000);
 
   // generate a random chain id
