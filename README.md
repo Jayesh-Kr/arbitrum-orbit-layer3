@@ -9,6 +9,27 @@ The workflow has two main parts:
 
 ---
 
+## Getting Arbitrum Sepolia ETH
+
+Before deploying, your wallet needs ETH on Arbitrum Sepolia. Follow these two steps:
+
+### Step 1: Get Sepolia ETH
+
+Choose one of the following options:
+
+- **Mine it** (no account required): [https://sepolia-faucet.pk910.de/](https://sepolia-faucet.pk910.de/)
+- **Faucet** (Google Cloud): [https://cloud.google.com/application/web3/faucet/ethereum/sepolia](https://cloud.google.com/application/web3/faucet/ethereum/sepolia)
+
+### Step 2: Bridge Sepolia ETH to Arbitrum Sepolia
+
+Once you have Sepolia ETH, bridge it to Arbitrum Sepolia using the official Arbitrum bridge:
+
+[https://portal.arbitrum.io/bridge](https://portal.arbitrum.io/bridge)
+
+Select **Sepolia** as the source network and **Arbitrum Sepolia** as the destination, then bridge the desired amount.
+
+---
+
 ## Prerequisites
 
 - Node.js >= 18
