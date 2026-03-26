@@ -184,7 +184,7 @@ cd orbit-setup-script
 docker compose up -d
 ```
 
-This starts the Orbit chain node. The public RPC will be available at `http://localhost:8449` and the BlockScout explorer at `http://localhost`.
+This starts the Orbit chain node. The public RPC will be available at `http://localhost:8449` and the BlockScout explorer at `ht`tp://localhost`.
 
 To follow the node logs:
 

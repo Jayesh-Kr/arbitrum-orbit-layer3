@@ -8,8 +8,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 config({ path: resolve(__dirname, '.env') });
 
 const PRIVATE_KEY = process.env.SENDER_PRIVATE_KEY
-const TOKEN_ADDRESS = process.env.CUSTOM_TOKEN_ADDRESS || '0xf4d293439bCCb7777FE70Df030844a4f5E12e80E';
-const INBOX = process.env.INBOX_ADDRESS || '0x51671A6e36bB38438b30A15e1988193A55a751F1';
+const TOKEN_ADDRESS = process.env.CUSTOM_TOKEN_ADDRESS;
+const INBOX = process.env.INBOX_ADDRESS;
 const AMOUNT = parseEther(process.env.AMOUNT_TO_SEND) || parseEther('1000'); // deposit 1000 HC
 
 const account = privateKeyToAccount(PRIVATE_KEY);
