@@ -285,3 +285,14 @@ orbit-setup-script/
   scripts/                         # TypeScript setup scripts
   docker-compose.yaml              # Starts the Orbit node
 ```
+
+---
+
+## Public Access via Cloudflare Tunnel
+
+To expose the local RPC on `localhost:8449` and the faucet on `localhost:3000` without opening inbound firewall ports, use a Cloudflare Tunnel with two hostnames:
+
+- `rpc.<your-domain>` -> `http://localhost:8449`
+- `faucet.<your-domain>` -> `http://localhost:3000`
+
+See the step-by-step guide in [docs/cloudflare-tunnel.md](D:\jayesh\arbitrum-orbit-layer3\docs\cloudflare-tunnel.md) and the example tunnel config in [ops/cloudflared/config.example.yml](D:\jayesh\arbitrum-orbit-layer3\ops\cloudflared\config.example.yml).

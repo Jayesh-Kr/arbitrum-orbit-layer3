@@ -1,0 +1,9 @@
+tunnel: <TUNNEL_UUID>
+credentials-file: C:\Users\<YOUR_WINDOWS_USER>\.cloudflared\<TUNNEL_UUID>.json
+
+ingress:
+  - hostname: rpc.<YOUR_DOMAIN>
+    service: http://localhost:8449
+  - hostname: faucet.<YOUR_DOMAIN>
+    service: http://localhost:3000
+  - service: http_status:404

@@ -3,6 +3,7 @@ import { useState } from "react";
 
 
 export default function FaucetPage() {
+  const maxClaimAmount = 20;
   const [address, setAddress] = useState("");
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
@@ -51,7 +52,9 @@ const handleClaim = async (e: React.FormEvent) => {
     <div className="flex flex-col items-center justify-center min-h-screen bg-zinc-50 dark:bg-black">
       <div className="w-full max-w-md p-8 rounded-2xl shadow-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
         <h1 className="text-3xl font-bold mb-4 text-zinc-900 dark:text-zinc-50">Token Faucet</h1>
-        <p className="mb-6 text-zinc-600 dark:text-zinc-400">Claim tokens to your wallet address.</p>
+        <p className="mb-6 text-zinc-600 dark:text-zinc-400">
+          Claim up to {maxClaimAmount} HUSH per request to your wallet address.
+        </p>
         <form onSubmit={handleClaim} className="flex flex-col gap-4">
           <input
             type="text"
@@ -76,8 +79,9 @@ const handleClaim = async (e: React.FormEvent) => {
           <input
             type="number"
             min="1"
+            max={maxClaimAmount}
             className="px-4 py-3 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-400"
-            placeholder="Number of tokens to claim"
+            placeholder={`Number of tokens to claim (max ${maxClaimAmount})`}
             value={amount}
             onChange={e => setAmount(e.target.value)}
             required

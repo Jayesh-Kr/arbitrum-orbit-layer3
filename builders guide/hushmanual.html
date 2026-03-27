@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hush Chain Builder Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #080809;
+      --surface: #0f0f11;
+      --surface-2: #161618;
+      --border: #222226;
+      --border-hover: #3a3a40;
+      --text: #f0f0f2;
+      --muted: #888892;
+      --faint: #444450;
+      --accent: #e8e8f0;
+      --mono: "DM Mono", monospace;
+      --sans: "DM Sans", sans-serif;
+      --display: "Syne", sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 48px 48px;
+      opacity: 0.3;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 48px 20px 72px;
+    }
+
+    /* Hero */
+    .hero {
+      margin-bottom: 48px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    .eyebrow::before {
+      content: "";
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--text);
+      opacity: 0.4;
+    }
+
+    h1 {
+      font-family: var(--display);
+      font-size: clamp(2.6rem, 7vw, 5rem);
+      font-weight: 800;
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+      color: var(--text);
+      margin-bottom: 22px;
+    }
+
+    .lede {
+      font-size: 1rem;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 560px;
+      margin-bottom: 28px;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--accent);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+    }
+
+    .chip::before {
+      content: "";
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--faint);
+      flex-shrink: 0;
+    }
+
+    /* Section label */
+    .section-title {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--faint);
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 1px;
+    }
+
+    .card {
+      background: var(--surface);
+      padding: 28px;
+      min-width: 0;
+      transition: background 0.15s;
+    }
+
+    .card:hover { background: var(--surface-2); }
+    .card-half  { grid-column: span 6; }
+    .card-third { grid-column: span 4; }
+    .card-full  { grid-column: span 12; }
+
+    @media (max-width: 700px) {
+      .card-half, .card-third { grid-column: span 12; }
+    }
+
+    .card h2 {
+      font-family: var(--sans);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.01em;
+      margin-bottom: 6px;
+    }
+
+    .card > p {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+
+    /* Network table */
+    .net-table { width: 100%; border-collapse: collapse; }
+
+    .net-table tr { border-bottom: 1px solid var(--border); }
+    .net-table tr:last-child { border-bottom: none; }
+
+    .net-table td {
+      padding: 10px 0;
+      font-size: 0.82rem;
+      line-height: 1.5;
+      vertical-align: top;
+    }
+
+    .net-table td:first-child {
+      color: var(--muted);
+      width: 120px;
+      padding-right: 16px;
+      white-space: nowrap;
+    }
+
+    .net-table td:last-child {
+      font-family: var(--mono);
+      color: var(--text);
+      word-break: break-all;
+    }
+
+    /* Endpoint card */
+    .endpoint-list { display: flex; flex-direction: column; gap: 10px; }
+
+    .endpoint {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    .endpoint-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface-2);
+    }
+
+    .endpoint-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--faint);
+    }
+
+    .copy-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-family: var(--mono);
+      font-size: 11px;
+      cursor: pointer;
+      transition: background 0.12s, border-color 0.12s;
+      flex-shrink: 0;
+    }
+
+    .copy-btn:hover { background: var(--surface-2); border-color: var(--border-hover); }
+
+    .copy-btn svg {
+      width: 11px; height: 11px;
+      stroke: currentColor; fill: none;
+      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+      flex-shrink: 0;
+    }
+
+    .endpoint-url {
+      padding: 12px;
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      color: var(--accent);
+      word-break: break-all;
+      line-height: 1.5;
+    }
+
+    /* Callout */
+    .callout {
+      margin-top: 14px;
+      padding: 11px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* Steps */
+    .steps { list-style: none; display: flex; flex-direction: column; }
+
+    .steps li {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 12px;
+      align-items: baseline;
+      padding: 11px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .steps li:last-child { border-bottom: none; }
+
+    .step-num {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--faint);
+      text-align: right;
+      padding-top: 2px;
+    }
+
+    .steps a { color: var(--text); text-underline-offset: 3px; }
+
+    /* Notes list */
+    .note-list { list-style: none; display: flex; flex-direction: column; }
+
+    .note-list li {
+      display: grid;
+      grid-template-columns: 14px 1fr;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.83rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .note-list li:last-child { border-bottom: none; }
+    .note-list li::before { content: "–"; color: var(--faint); font-family: var(--mono); }
+
+    .note-list code {
+      font-family: var(--mono);
+      font-size: 0.79rem;
+      background: var(--surface-2);
+      padding: 1px 5px;
+      border-radius: 4px;
+      color: var(--accent);
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 0;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 8px 0;
+      border: none;
+      background: var(--surface-2);
+      color: var(--faint);
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      border-right: 1px solid var(--border);
+      transition: background 0.12s, color 0.12s;
+    }
+
+    .tab-btn:last-child { border-right: none; }
+    .tab-btn.active { background: var(--surface); color: var(--text); }
+    .tab-btn:hover:not(.active) { background: var(--surface); color: var(--muted); }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* Code block */
+    .codeblock {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .codeblock pre {
+      padding: 14px;
+      overflow-x: auto;
+      font-family: var(--mono);
+      font-size: 0.79rem;
+      line-height: 1.7;
+      color: var(--accent);
+      white-space: pre;
+    }
+
+    /* Meta block */
+    .meta-block {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .meta-row {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      border-bottom: 1px solid var(--border);
+      min-width: 0;
+    }
+
+    .meta-row:last-child { border-bottom: none; }
+
+    .meta-key, .meta-val {
+      padding: 10px 14px;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      line-height: 1.5;
+    }
+
+    .meta-key {
+      color: var(--faint);
+      background: var(--surface-2);
+      border-right: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    .meta-val { color: var(--accent); word-break: break-all; min-width: 0; }
+
+    @media (max-width: 560px) {
+      .meta-row { grid-template-columns: 1fr; }
+      .meta-key { border-right: none; border-bottom: 1px solid var(--border); }
+    }
+
+    /* Solo cards */
+    .solo-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      margin-top: 1px;
+      min-width: 0;
+    }
+
+    .solo-card h2 {
+      font-family: var(--sans);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .solo-card > p {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+
+    /* Checklist */
+    .checklist { list-style: none; display: flex; flex-direction: column; }
+
+    .checklist li {
+      display: grid;
+      grid-template-columns: 20px 1fr;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.6;
+      align-items: center;
+    }
+
+    .checklist li:last-child { border-bottom: none; }
+
+    .check-icon {
+      width: 18px; height: 18px;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .check-icon svg {
+      width: 10px; height: 10px;
+      stroke: var(--faint); fill: none;
+      stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round;
+    }
+
+    /* Built on */
+    .built-on {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      margin-top: 32px;
+      padding: 18px 28px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+      text-decoration: none;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .built-on:hover { border-color: var(--border-hover); background: var(--surface-2); }
+
+    .bo-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--faint);
+    }
+
+    .bo-divider { width: 1px; height: 14px; background: var(--border); }
+
+    .bo-name {
+      font-family: var(--display);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .bo-arrow { font-size: 0.85rem; color: var(--faint); transition: transform 0.15s; }
+    .built-on:hover .bo-arrow { transform: translateX(4px); }
+
+    /* Inline code util */
+    .ic {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      background: var(--surface-2);
+      padding: 1px 5px;
+      border-radius: 4px;
+      color: var(--accent);
+    }
+
+    /* ── Mobile ───────────────── */
+    @media (max-width: 640px) {
+      .wrap { padding: 28px 14px 56px; }
+
+      /* All cards go full width */
+      .card-half,
+      .card-third { grid-column: span 12; }
+
+      /* Tighter card padding */
+      .card { padding: 20px 16px; }
+      .solo-card { padding: 20px 16px; }
+
+      /* Hero */
+      .hero { margin-bottom: 32px; padding-bottom: 28px; }
+
+      /* Meta table: stack key above value */
+      .meta-row { grid-template-columns: 1fr; }
+      .meta-key {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        padding: 8px 12px 6px;
+      }
+      .meta-val { padding: 6px 12px 10px; }
+
+      /* Tabs: make labels slightly smaller so all three fit */
+      .tab-btn { font-size: 10px; padding: 8px 4px; }
+
+      /* Code blocks: allow horizontal scroll, don't shrink font */
+      .codeblock pre { font-size: 0.75rem; }
+
+      /* Chips wrap fine already, just nudge font */
+      .chip { font-size: 0.74rem; }
+
+      /* Built-on banner */
+      .built-on { padding: 14px 18px; gap: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+
+    <!-- Hero -->
+    <header class="hero">
+      <div class="eyebrow">Hush Networks</div>
+      <h1>Build on<br>Hush Chain</h1>
+      <p class="lede">
+        An EVM network for builders. Connect wallets, deploy contracts, run scripts,
+        and integrate apps using the public RPC. Get starter HUSH from the faucet.
+      </p>
+      <div class="chips">
+        <span class="chip">Network: Hush Chain</span>
+        <span class="chip">Symbol: HUSH</span>
+        <span class="chip">Chain ID: 47755852468</span>
+      </div>
+    </header>
+
+    <!-- Card grid -->
+    <div class="grid">
+
+      <!-- Network Details -->
+      <div class="card card-half">
+        <div class="section-title">01 — Network Details</div>
+        <h2>Network Config</h2>
+        <p>Add these values to MetaMask, Rabby, Hardhat, Foundry, or any EVM tooling.</p>
+        <table class="net-table">
+          <tr><td>Network Name</td><td>Hush Chain</td></tr>
+          <tr><td>Chain ID</td><td>47755852468</td></tr>
+          <tr><td>Symbol</td><td>HUSH</td></tr>
+          <tr><td>Decimals</td><td>18</td></tr>
+          <tr><td>RPC URL</td><td>https://rpc.hushnetworks.in</td></tr>
+          <tr><td>Faucet URL</td><td>https://faucet.hushnetworks.in</td></tr>
+        </table>
+      </div>
+
+      <!-- Copy URLs -->
+      <div class="card card-half">
+        <div class="section-title">02 — Endpoints</div>
+        <h2>Copy URLs</h2>
+        <p>The two public URLs every builder needs.</p>
+        <div class="endpoint-list">
+          <div class="endpoint">
+            <div class="endpoint-head">
+              <span class="endpoint-label">RPC Endpoint</span>
+              <button class="copy-btn" onclick="copyEndpoint('ep-rpc', this)">
+                <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Copy
+              </button>
+            </div>
+            <div class="endpoint-url" id="ep-rpc">https://rpc.hushnetworks.in</div>
+          </div>
+          <div class="endpoint">
+            <div class="endpoint-head">
+              <span class="endpoint-label">Faucet</span>
+              <button class="copy-btn" onclick="copyEndpoint('ep-faucet', this)">
+                <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Copy
+              </button>
+            </div>
+            <div class="endpoint-url" id="ep-faucet">https://faucet.hushnetworks.in</div>
+          </div>
+        </div>
+        <div class="callout">
+          Opening the RPC URL in a browser may show a blank page — that is normal.
+          RPC endpoints receive JSON-RPC POST requests, not browser traffic.
+        </div>
+      </div>
+
+      <!-- Faucet -->
+      <div class="card card-third">
+        <div class="section-title">03 — Faucet</div>
+        <h2>Get HUSH</h2>
+        <p>Request starter tokens for deployments and testing.</p>
+        <ol class="steps">
+          <li>
+            <span class="step-num">01</span>
+            <span>Open <a href="https://faucet.hushnetworks.in" target="_blank" rel="noreferrer">faucet.hushnetworks.in</a></span>
+          </li>
+          <li><span class="step-num">02</span><span>Paste your wallet address</span></li>
+          <li><span class="step-num">03</span><span>Choose an amount and submit</span></li>
+          <li><span class="step-num">04</span><span>Wait for the success message</span></li>
+        </ol>
+        <div class="callout">Use the same wallet you plan to use for deployments and testing.</div>
+      </div>
+
+      <!-- Dev Usage -->
+      <div class="card card-third">
+        <div class="section-title">04 — Developer Usage</div>
+        <h2>Tooling Config</h2>
+        <p>Paste the RPC URL into your preferred tool.</p>
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab(this, 'tab-hardhat')">Hardhat</button>
+          <button class="tab-btn" onclick="switchTab(this, 'tab-foundry')">Foundry</button>
+          <button class="tab-btn" onclick="switchTab(this, 'tab-curl')">curl</button>
+        </div>
+        <div class="tab-panel active" id="tab-hardhat">
+          <div class="codeblock"><pre>networks: {
+  hush: {
+    url: "https://rpc.hushnetworks.in",
+    chainId: 47755852468,
+    accounts: [process.env.PRIVATE_KEY]
+  }
+}</pre></div>
+        </div>
+        <div class="tab-panel" id="tab-foundry">
+          <div class="codeblock"><pre>forge script script/Deploy.s.sol \
+  --rpc-url https://rpc.hushnetworks.in \
+  --broadcast</pre></div>
+        </div>
+        <div class="tab-panel" id="tab-curl">
+          <div class="codeblock"><pre>curl -X POST https://rpc.hushnetworks.in \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0",
+       "method":"eth_chainId",
+       "params":[],"id":1}'</pre></div>
+        </div>
+      </div>
+
+      <!-- RPC Notes -->
+      <div class="card card-third">
+        <div class="section-title">05 — RPC Notes</div>
+        <h2>Usage Notes</h2>
+        <p>Things to keep in mind when integrating.</p>
+        <ul class="note-list">
+          <li>Endpoint is for programmatic use — not browser navigation</li>
+          <li>Use methods like <code>eth_chainId</code>, <code>eth_blockNumber</code>, <code>eth_sendRawTransaction</code></li>
+          <li>A blank page at the RPC URL is not an error</li>
+          <li>If a script fails, test with a small JSON-RPC POST first</li>
+        </ul>
+      </div>
+
+    </div><!-- /grid -->
+
+    <!-- Chain Metadata -->
+    <div class="solo-card">
+      <div class="section-title">06 — Chain Metadata</div>
+      <h2>Public Chain Metadata</h2>
+      <p>Safe to publish in developer docs, wallets, and app configs.</p>
+      <div class="meta-block">
+        <div class="meta-row"><div class="meta-key">CHAIN_DISPLAY_NAME</div><div class="meta-val">Hush Chain</div></div>
+        <div class="meta-row"><div class="meta-key">CHAIN_ID</div><div class="meta-val">47755852468</div></div>
+        <div class="meta-row"><div class="meta-key">CHAIN_DISPLAY_SHORT_NAME</div><div class="meta-val">Hush Chain</div></div>
+        <div class="meta-row"><div class="meta-key">CHAIN_RPC_URL</div><div class="meta-val">https://rpc.hushnetworks.in</div></div>
+        <div class="meta-row"><div class="meta-key">CHAIN_TOKEN_SYMBOL</div><div class="meta-val">HUSH</div></div>
+        <div class="meta-row"><div class="meta-key">CHAIN_TOKEN_DECIMALS</div><div class="meta-val">18</div></div>
+        <div class="meta-row"><div class="meta-key">CHAIN_TOKEN_NAME</div><div class="meta-val">Hush Token</div></div>
+      </div>
+      <div class="callout" style="margin-top:14px;">
+        Always use <span class="ic">https://rpc.hushnetworks.in</span> in public docs, wallets, apps, and scripts.
+      </div>
+    </div>
+
+    <!-- Quick Checklist -->
+    <div class="solo-card">
+      <div class="section-title">Quick Checklist</div>
+      <h2>Before You Ship</h2>
+      <ul class="checklist">
+        <li>
+          <div class="check-icon"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+          Add Hush Chain to your wallet using the public RPC URL and chain ID
+        </li>
+        <li>
+          <div class="check-icon"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+          Use the faucet to get starter HUSH for gas
+        </li>
+        <li>
+          <div class="check-icon"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+          Deploy contracts or connect your app to the RPC
+        </li>
+        <li>
+          <div class="check-icon"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+          Use only the public RPC URL in all scripts and tooling
+        </li>
+      </ul>
+    </div>
+
+    <!-- Built on Hush Chain -->
+    <a class="built-on" href="https://hushnetworks.in/" target="_blank" rel="noreferrer">
+      <span class="bo-label">Built on</span>
+      <span class="bo-divider"></span>
+      <span class="bo-name">Hush Chain</span>
+      <span class="bo-arrow">→</span>
+    </a>
+
+  </main>
+
+  <script>
+    function copyEndpoint(id, btn) {
+      const text = document.getElementById(id).textContent.trim();
+      navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.innerHTML;
+        btn.innerHTML = `<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Copied`;
+        setTimeout(() => { btn.innerHTML = orig; }, 1400);
+      });
+    }
+
+    function switchTab(btn, panelId) {
+      const card = btn.closest('.card');
+      card.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      card.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(panelId).classList.add('active');
+    }
+  </script>
+</body>
+</html>
